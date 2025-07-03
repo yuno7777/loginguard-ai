@@ -608,6 +608,31 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                     Load Sample Data
                   </button>
                 </div>
+
+                {/* Sample Files Section */}
+                {sampleFiles.length > 0 && (
+                  <div className="sample-files-section">
+                    <h4 className="sample-files-title">Sample Data Files</h4>
+                    <div className="sample-files-grid">
+                      {sampleFiles.map((file, index) => (
+                        <div key={index} className="sample-file-card">
+                          <div className="sample-file-info">
+                            <div className="sample-file-name">{file.display_name}</div>
+                            <div className="sample-file-details">
+                              {file.log_count} logs • {Math.round(file.size_bytes / 1024)}KB
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => loadSampleFile(file.filename)}
+                            className="sample-file-btn"
+                          >
+                            Load
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
