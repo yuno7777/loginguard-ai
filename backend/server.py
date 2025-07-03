@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
 import os
@@ -15,6 +15,13 @@ import uuid
 from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient
 import logging
+import psutil
+import tempfile
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.units import inch
+from reportlab.lib import colors
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
