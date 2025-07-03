@@ -504,7 +504,9 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
       </header>
 
       <main className="main">
-        {!analysisResult ? (
+        {activeView === 'health' ? (
+          <HealthDashboard />
+        ) : !analysisResult ? (
           <div className="upload-section">
             {/* Hero Section */}
             <div className="hero">
