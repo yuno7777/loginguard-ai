@@ -420,6 +420,406 @@ async def test_gemini():
         logger.error(f"Gemini API test failed: {e}")
         return {"status": "error", "error": str(e)}
 
+@app.post("/api/export-csv/{analysis_id}")
+async def export_analysis_csv(analysis_id: str):
+    """Export analysis results as CSV"""
+    try:
+        # Get analysis from database
+        analysis = await analysis_collection.find_one({"analysis_id": analysis_id})
+        if not analysis:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv', newline='')
+        
+        # Create CSV writer
+        writer = csv.writer(temp_file)
+        
+        # Write headers
+        headers = [
+            'Log_Number', 'Username', 'IP_Address', 'Timestamp', 'Location', 
+            'Device', 'Login_Status', 'Risk_Level', 'Risk_Factors', 'Analysis_Explanation'
+        ]
+        writer.writerow(headers)
+        
+        # Write log data
+        all_logs = (
+            analysis['analysis_result'].get('high_risk_logs', []) +
+            analysis['analysis_result'].get('medium_risk_logs', []) +
+            analysis['analysis_result'].get('low_risk_logs', [])
+        )
+        
+        for i, log_analysis in enumerate(analysis['analysis_result'].get('log_analysis', []), 1):
+            # Find corresponding log
+            log_data = None
+            for log in analysis.get('logs', []):
+                if analysis['logs'].index(log) == log_analysis.get('log_index', -1):
+                    log_data = log
+                    break
+            
+            if log_data:
+                risk_factors = '; '.join(log_analysis.get('risk_factors', []))
+                
+                row = [
+                    i,
+                    log_data.get('username', ''),
+                    log_data.get('ip_address', ''),
+                    log_data.get('timestamp', ''),
+                    log_data.get('location', ''),
+                    log_data.get('device', ''),
+                    log_data.get('login_status', ''),
+                    log_analysis.get('risk_level', 'LOW'),
+                    risk_factors,
+                    log_analysis.get('explanation', '')
+                ]
+                writer.writerow(row)
+        
+        # Add summary information
+        writer.writerow([])
+        writer.writerow(['ANALYSIS SUMMARY'])
+        writer.writerow(['Overall Risk Level', analysis['analysis_result'].get('overall_risk_score', 'UNKNOWN')])
+        writer.writerow(['Risk Summary', analysis['analysis_result'].get('risk_summary', '')])
+        writer.writerow(['Analysis Date', analysis.get('created_at', '').strftime('%Y-%m-%d %H:%M:%S') if analysis.get('created_at') else ''])
+        
+        # Add recommendations
+        writer.writerow([])
+        writer.writerow(['SECURITY RECOMMENDATIONS'])
+        for i, rec in enumerate(analysis['analysis_result'].get('recommendations', []), 1):
+            writer.writerow([f'Recommendation {i}', rec])
+        
+        temp_file.close()
+        
+        # Return file
+        return FileResponse(
+            temp_file.name,
+            media_type='text/csv',
+            filename=f'loginguard_analysis_{analysis_id[:8]}.csv'
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting CSV: {e}")
+        raise HTTPException(status_code=500, detail=f"Error exporting CSV: {str(e)}")
+
+@app.post("/api/export-pdf/{analysis_id}")
+async def export_analysis_pdf(analysis_id: str):
+    """Export analysis results as PDF"""
+    try:
+        # Get analysis from database
+        analysis = await analysis_collection.find_one({"analysis_id": analysis_id})
+        if not analysis:
+            raise HTTPException(status_code=404, detail="Analysis not found")
+        
+        # Create temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        temp_file.close()
+        
+        # Create PDF document
+        doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Title
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30,
+            alignment=1,  # Center alignment
+            textColor=colors.darkblue
+        )
+        story.append(Paragraph("LoginGuard AI Security Analysis Report", title_style))
+        story.append(Spacer(1, 20))
+        
+        # Analysis Info
+        info_data = [
+            ['Analysis ID:', analysis_id],
+            ['Analysis Date:', analysis.get('created_at', '').strftime('%Y-%m-%d %H:%M:%S') if analysis.get('created_at') else 'Unknown'],
+            ['Total Logs Analyzed:', str(analysis.get('logs_count', 0))],
+            ['Overall Risk Level:', analysis['analysis_result'].get('overall_risk_score', 'UNKNOWN')]
+        ]
+        
+        info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+        info_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(info_table)
+        story.append(Spacer(1, 20))
+        
+        # Risk Summary
+        story.append(Paragraph("Risk Assessment Summary", styles['Heading2']))
+        story.append(Paragraph(analysis['analysis_result'].get('risk_summary', 'No summary available'), styles['Normal']))
+        story.append(Spacer(1, 20))
+        
+        # Risk Statistics
+        high_count = len(analysis['analysis_result'].get('high_risk_logs', []))
+        medium_count = len(analysis['analysis_result'].get('medium_risk_logs', []))
+        low_count = len(analysis['analysis_result'].get('low_risk_logs', []))
+        
+        risk_data = [
+            ['Risk Level', 'Count', 'Percentage'],
+            ['High Risk', str(high_count), f"{(high_count/analysis.get('logs_count', 1)*100):.1f}%"],
+            ['Medium Risk', str(medium_count), f"{(medium_count/analysis.get('logs_count', 1)*100):.1f}%"],
+            ['Low Risk', str(low_count), f"{(low_count/analysis.get('logs_count', 1)*100):.1f}%"]
+        ]
+        
+        risk_table = Table(risk_data, colWidths=[2*inch, 1*inch, 1.5*inch])
+        risk_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        story.append(risk_table)
+        story.append(Spacer(1, 20))
+        
+        # Security Recommendations
+        story.append(Paragraph("Security Recommendations", styles['Heading2']))
+        for i, rec in enumerate(analysis['analysis_result'].get('recommendations', []), 1):
+            story.append(Paragraph(f"{i}. {rec}", styles['Normal']))
+            story.append(Spacer(1, 10))
+        
+        story.append(Spacer(1, 20))
+        
+        # High Risk Logs Detail
+        if high_count > 0:
+            story.append(Paragraph("High Risk Logs Details", styles['Heading2']))
+            
+            for i, log_analysis in enumerate(analysis['analysis_result'].get('log_analysis', [])):
+                if log_analysis.get('risk_level') == 'HIGH':
+                    # Find corresponding log
+                    log_data = None
+                    for log in analysis.get('logs', []):
+                        if analysis['logs'].index(log) == log_analysis.get('log_index', -1):
+                            log_data = log
+                            break
+                    
+                    if log_data:
+                        story.append(Paragraph(f"Log #{i+1}: {log_data.get('username', 'Unknown')}", styles['Heading3']))
+                        
+                        log_details = [
+                            ['Field', 'Value'],
+                            ['Username', log_data.get('username', '')],
+                            ['IP Address', log_data.get('ip_address', '')],
+                            ['Timestamp', log_data.get('timestamp', '')],
+                            ['Location', log_data.get('location', '')],
+                            ['Device', log_data.get('device', '')],
+                            ['Status', log_data.get('login_status', '')],
+                            ['Risk Factors', '; '.join(log_analysis.get('risk_factors', []))]
+                        ]
+                        
+                        log_table = Table(log_details, colWidths=[1.5*inch, 4*inch])
+                        log_table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.red),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (-1, -1), 9),
+                            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.mistyrose),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                        ]))
+                        story.append(log_table)
+                        story.append(Spacer(1, 15))
+        
+        # Footer
+        story.append(Spacer(1, 30))
+        footer_style = ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=10,
+            alignment=1,
+            textColor=colors.grey
+        )
+        story.append(Paragraph("Generated by LoginGuard AI - Advanced Login Security Analysis", footer_style))
+        
+        # Build PDF
+        doc.build(story)
+        
+        # Return file
+        return FileResponse(
+            temp_file.name,
+            media_type='application/pdf',
+            filename=f'loginguard_analysis_{analysis_id[:8]}.pdf'
+        )
+        
+    except Exception as e:
+        logger.error(f"Error exporting PDF: {e}")
+        raise HTTPException(status_code=500, detail=f"Error exporting PDF: {str(e)}")
+
+@app.get("/api/health-dashboard")
+async def health_dashboard():
+    """Get comprehensive system health information"""
+    try:
+        # System metrics
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        
+        # Database health
+        db_healthy = True
+        db_status = "Connected"
+        try:
+            # Test database connection
+            await db.command("ping")
+        except Exception as e:
+            db_healthy = False
+            db_status = f"Error: {str(e)}"
+        
+        # Gemini API health
+        gemini_healthy = True
+        gemini_status = "Connected"
+        try:
+            session_id = str(uuid.uuid4())
+            chat = LlmChat(
+                api_key=GEMINI_API_KEY,
+                session_id=session_id,
+                system_message="You are a helpful assistant."
+            ).with_model("gemini", "gemini-2.0-flash")
+            
+            user_message = UserMessage(text="Health check")
+            await chat.send_message(user_message)
+        except Exception as e:
+            gemini_healthy = False
+            gemini_status = f"Error: {str(e)}"
+        
+        # Get recent analysis stats
+        recent_analyses = await analysis_collection.count_documents({
+            "created_at": {"$gte": datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)}
+        })
+        
+        total_analyses = await analysis_collection.count_documents({})
+        
+        # Service uptime (approximate)
+        boot_time = datetime.fromtimestamp(psutil.boot_time())
+        uptime = datetime.now() - boot_time
+        
+        health_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "overall_status": "healthy" if db_healthy and gemini_healthy else "degraded",
+            "system_metrics": {
+                "cpu_usage_percent": cpu_percent,
+                "memory_usage_percent": memory.percent,
+                "memory_used_gb": round(memory.used / (1024**3), 2),
+                "memory_total_gb": round(memory.total / (1024**3), 2),
+                "disk_usage_percent": disk.percent,
+                "disk_used_gb": round(disk.used / (1024**3), 2),
+                "disk_total_gb": round(disk.total / (1024**3), 2),
+                "uptime_hours": round(uptime.total_seconds() / 3600, 1)
+            },
+            "services": {
+                "database": {
+                    "status": db_status,
+                    "healthy": db_healthy
+                },
+                "gemini_ai": {
+                    "status": gemini_status,
+                    "healthy": gemini_healthy
+                }
+            },
+            "analytics": {
+                "analyses_today": recent_analyses,
+                "total_analyses": total_analyses
+            },
+            "alerts": []
+        }
+        
+        # Add alerts based on thresholds
+        if cpu_percent > 80:
+            health_data["alerts"].append({
+                "type": "warning",
+                "message": f"High CPU usage: {cpu_percent}%"
+            })
+        
+        if memory.percent > 85:
+            health_data["alerts"].append({
+                "type": "warning", 
+                "message": f"High memory usage: {memory.percent}%"
+            })
+        
+        if disk.percent > 90:
+            health_data["alerts"].append({
+                "type": "critical",
+                "message": f"High disk usage: {disk.percent}%"
+            })
+        
+        if not db_healthy:
+            health_data["alerts"].append({
+                "type": "critical",
+                "message": "Database connection failed"
+            })
+        
+        if not gemini_healthy:
+            health_data["alerts"].append({
+                "type": "critical",
+                "message": "Gemini AI service unavailable"
+            })
+        
+        return health_data
+        
+    except Exception as e:
+        logger.error(f"Error getting health dashboard: {e}")
+        raise HTTPException(status_code=500, detail=f"Error getting health dashboard: {str(e)}")
+
+@app.get("/api/sample-files")
+async def get_sample_files():
+    """Get list of available sample log files"""
+    try:
+        sample_dir = "/app/sample_data"
+        sample_files = []
+        
+        if os.path.exists(sample_dir):
+            for filename in os.listdir(sample_dir):
+                if filename.endswith('.csv'):
+                    file_path = os.path.join(sample_dir, filename)
+                    file_size = os.path.getsize(file_path)
+                    
+                    # Count lines in file
+                    with open(file_path, 'r') as f:
+                        line_count = sum(1 for line in f) - 1  # Subtract header
+                    
+                    sample_files.append({
+                        "filename": filename,
+                        "display_name": filename.replace('_', ' ').replace('.csv', '').title(),
+                        "size_bytes": file_size,
+                        "log_count": line_count
+                    })
+        
+        return {"sample_files": sample_files}
+        
+    except Exception as e:
+        logger.error(f"Error getting sample files: {e}")
+        raise HTTPException(status_code=500, detail=f"Error getting sample files: {str(e)}")
+
+@app.get("/api/sample-file/{filename}")
+async def download_sample_file(filename: str):
+    """Download a specific sample file"""
+    try:
+        sample_dir = "/app/sample_data"
+        file_path = os.path.join(sample_dir, filename)
+        
+        if not os.path.exists(file_path) or not filename.endswith('.csv'):
+            raise HTTPException(status_code=404, detail="Sample file not found")
+        
+        return FileResponse(
+            file_path,
+            media_type='text/csv',
+            filename=filename
+        )
+        
+    except Exception as e:
+        logger.error(f"Error downloading sample file: {e}")
+        raise HTTPException(status_code=500, detail=f"Error downloading sample file: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
