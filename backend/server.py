@@ -489,11 +489,16 @@ async def export_analysis_csv(analysis_id: str):
         
         temp_file.close()
         
-        # Return file
+        # Return file with proper headers
+        filename = f'loginguard_analysis_{analysis_id[:8]}.csv'
         return FileResponse(
             temp_file.name,
-            media_type='text/csv',
-            filename=f'loginguard_analysis_{analysis_id[:8]}.csv'
+            media_type='application/octet-stream',
+            filename=filename,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
         )
         
     except Exception as e:
@@ -645,11 +650,16 @@ async def export_analysis_pdf(analysis_id: str):
         # Build PDF
         doc.build(story)
         
-        # Return file
+        # Return file with proper headers
+        filename = f'loginguard_analysis_{analysis_id[:8]}.pdf'
         return FileResponse(
             temp_file.name,
-            media_type='application/pdf',
-            filename=f'loginguard_analysis_{analysis_id[:8]}.pdf'
+            media_type='application/octet-stream',
+            filename=filename,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Access-Control-Expose-Headers": "Content-Disposition"
+            }
         )
         
     except Exception as e:
