@@ -1,4 +1,4 @@
-/* LogSentinel Lite - Modern Dark Theme */
+/* LoginGuard AI - Modern Dark Theme */
 
 * {
   margin: 0;
@@ -187,7 +187,9 @@ body {
 }
 
 .tab-icon {
-  font-size: 1.1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Upload Card */
@@ -252,9 +254,11 @@ body {
 }
 
 .dropzone-icon {
-  font-size: 4rem;
+  font-size: 2rem;
+  font-weight: 800;
   margin-bottom: 1rem;
   opacity: 0.8;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .dropzone-text {
@@ -308,7 +312,9 @@ body {
 }
 
 .file-icon {
-  font-size: 1.2rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Raw Textarea */
@@ -425,7 +431,9 @@ body {
 }
 
 .error-icon {
-  font-size: 1.2rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 /* Results Section */
@@ -496,13 +504,16 @@ body {
 }
 
 .risk-icon-large {
-  font-size: 3rem;
+  font-size: 1rem;
+  font-weight: 800;
   background: rgba(255, 255, 255, 0.1);
   padding: 1rem;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
+  letter-spacing: 0.5px;
+  min-width: 80px;
 }
 
 .risk-summary-info {
@@ -582,7 +593,9 @@ body {
 }
 
 .title-icon {
-  font-size: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .recommendations-list {
@@ -629,7 +642,9 @@ body {
 }
 
 .section-icon {
-  font-size: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .logs-grid {
@@ -701,8 +716,8 @@ body {
 .risk-badge {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -774,7 +789,9 @@ body {
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .expand-btn:hover {

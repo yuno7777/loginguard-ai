@@ -111,13 +111,13 @@ const App = () => {
   const getRiskIcon = (riskLevel) => {
     switch (riskLevel) {
       case 'HIGH':
-        return '🚨';
+        return 'CRITICAL';
       case 'MEDIUM':
-        return '⚠️';
+        return 'WARNING';
       case 'LOW':
-        return '✅';
+        return 'SAFE';
       default:
-        return '❓';
+        return 'UNKNOWN';
     }
   };
 
@@ -165,7 +165,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
               <span className="log-number">#{index + 1}</span>
               <span className="log-username">{log.username}</span>
               <span className={`risk-badge ${getRiskColor(log.risk_level)}`}>
-                {getRiskIcon(log.risk_level)} {log.risk_level}
+                {getRiskIcon(log.risk_level)}
               </span>
             </div>
             <div className="log-card-details">
@@ -195,14 +195,14 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             onClick={() => setExpanded(!expanded)}
             className="expand-btn"
           >
-            {expanded ? '📊' : '🔍'}
+            {expanded ? 'LESS' : 'MORE'}
           </button>
         </div>
         {expanded && (
           <div className="log-card-expanded">
             {log.risk_factors && log.risk_factors.length > 0 && (
               <div className="risk-factors">
-                <h4>🎯 Risk Factors:</h4>
+                <h4>Risk Factors:</h4>
                 <ul>
                   {log.risk_factors.map((factor, i) => (
                     <li key={i}>{factor}</li>
@@ -212,7 +212,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             )}
             {log.explanation && (
               <div className="explanation">
-                <h4>💡 Analysis:</h4>
+                <h4>Analysis:</h4>
                 <p>{log.explanation}</p>
               </div>
             )}
@@ -229,7 +229,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
         <div className="header-content">
           <div className="logo">
             <div className="logo-icon">🛡️</div>
-            <h1>LogSentinel Lite</h1>
+            <h1>LoginGuard AI</h1>
           </div>
           <div className="header-subtitle">
             AI-Powered Login Security Analysis
@@ -261,14 +261,14 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                   onClick={() => setActiveTab('upload')}
                   className={`tab-btn ${activeTab === 'upload' ? 'active' : ''}`}
                 >
-                  <span className="tab-icon">📁</span>
+                  <span className="tab-icon">FILE</span>
                   Upload CSV
                 </button>
                 <button
                   onClick={() => setActiveTab('raw')}
                   className={`tab-btn ${activeTab === 'raw' ? 'active' : ''}`}
                 >
-                  <span className="tab-icon">📝</span>
+                  <span className="tab-icon">TEXT</span>
                   Paste Raw Logs
                 </button>
               </div>
@@ -288,7 +288,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                   onDrop={handleDrop}
                 >
                   <div className="dropzone-content">
-                    <div className="dropzone-icon">📁</div>
+                    <div className="dropzone-icon">FILE</div>
                     <p className="dropzone-text">
                       Drag and drop your CSV file here
                     </p>
@@ -312,7 +312,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                 {uploadedFile && (
                   <div className="file-selected">
                     <div className="file-info">
-                      <span className="file-icon">✅</span>
+                      <span className="file-icon">READY</span>
                       <span className="file-name">{uploadedFile.name}</span>
                     </div>
                   </div>
@@ -330,14 +330,14 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                         Analyzing...
                       </>
                     ) : (
-                      <>🔍 Analyze Logs</>
+                      <>Analyze Logs</>
                     )}
                   </button>
                   <button
                     onClick={loadSampleData}
                     className="sample-btn secondary"
                   >
-                    📋 Load Sample Data
+                    Load Sample Data
                   </button>
                 </div>
               </div>
@@ -370,14 +370,14 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                         Analyzing...
                       </>
                     ) : (
-                      <>🔍 Analyze Logs</>
+                      <>Analyze Logs</>
                     )}
                   </button>
                   <button
                     onClick={loadSampleData}
                     className="sample-btn secondary"
                   >
-                    📋 Load Sample Data
+                    Load Sample Data
                   </button>
                 </div>
               </div>
@@ -387,7 +387,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {error && (
               <div className="error-card">
                 <div className="error-content">
-                  <span className="error-icon">⚠️</span>
+                  <span className="error-icon">ERROR</span>
                   <span className="error-text">{error}</span>
                 </div>
               </div>
@@ -403,7 +403,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
                 onClick={resetAnalysis}
                 className="new-analysis-btn"
               >
-                📝 New Analysis
+                New Analysis
               </button>
             </div>
 
@@ -441,7 +441,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {analysisResult.recommendations && analysisResult.recommendations.length > 0 && (
               <div className="recommendations-card">
                 <h3 className="card-title">
-                  <span className="title-icon">💡</span>
+                  <span className="title-icon">RECOMMENDATIONS</span>
                   Security Recommendations
                 </h3>
                 <ul className="recommendations-list">
@@ -459,7 +459,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {analysisResult.high_risk_logs.length > 0 && (
               <div className="logs-section">
                 <h3 className="section-title">
-                  <span className="section-icon">🚨</span>
+                  <span className="section-icon">CRITICAL</span>
                   High Risk Logs ({analysisResult.high_risk_logs.length})
                 </h3>
                 <div className="logs-grid">
@@ -474,7 +474,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {analysisResult.medium_risk_logs.length > 0 && (
               <div className="logs-section">
                 <h3 className="section-title">
-                  <span className="section-icon">⚠️</span>
+                  <span className="section-icon">WARNING</span>
                   Medium Risk Logs ({analysisResult.medium_risk_logs.length})
                 </h3>
                 <div className="logs-grid">
@@ -489,7 +489,7 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {analysisResult.low_risk_logs.length > 0 && (
               <div className="logs-section">
                 <h3 className="section-title">
-                  <span className="section-icon">✅</span>
+                  <span className="section-icon">SAFE</span>
                   Low Risk Logs ({analysisResult.low_risk_logs.length})
                 </h3>
                 <div className="logs-grid">
