@@ -692,12 +692,42 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
             {/* Results Header */}
             <div className="results-header">
               <h2 className="results-title">Analysis Results</h2>
-              <button
-                onClick={resetAnalysis}
-                className="new-analysis-btn"
-              >
-                New Analysis
-              </button>
+              <div className="results-actions">
+                <button
+                  onClick={() => exportAnalysis('csv')}
+                  disabled={exporting.csv}
+                  className="export-btn csv"
+                >
+                  {exporting.csv ? (
+                    <>
+                      <div className="spinner-small"></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    'Export CSV'
+                  )}
+                </button>
+                <button
+                  onClick={() => exportAnalysis('pdf')}
+                  disabled={exporting.pdf}
+                  className="export-btn pdf"
+                >
+                  {exporting.pdf ? (
+                    <>
+                      <div className="spinner-small"></div>
+                      Exporting...
+                    </>
+                  ) : (
+                    'Export PDF'
+                  )}
+                </button>
+                <button
+                  onClick={resetAnalysis}
+                  className="new-analysis-btn"
+                >
+                  New Analysis
+                </button>
+              </div>
             </div>
 
             {/* Overall Risk Summary */}
