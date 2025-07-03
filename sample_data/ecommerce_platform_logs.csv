@@ -1,0 +1,21 @@
+username,ip_address,timestamp,location,device,login_status
+customer_alice,203.0.113.45,2024-01-15 10:30:15,Toronto,Chrome/Windows,success
+customer_bob,198.51.100.67,2024-01-15 11:15:30,Vancouver,Safari/iPhone,success
+admin_store,192.168.5.10,2024-01-15 08:00:45,Toronto,Chrome/macOS,success
+fraud_attempt,203.0.113.123,2024-01-15 02:15:22,Nigeria,Script/Bot,failed
+fraud_attempt,203.0.113.123,2024-01-15 02:15:27,Nigeria,Script/Bot,failed
+fraud_attempt,203.0.113.123,2024-01-15 02:15:32,Nigeria,Script/Bot,failed
+fraud_attempt,203.0.113.123,2024-01-15 02:15:37,Nigeria,Script/Bot,failed
+support_agent,192.168.5.25,2024-01-15 09:30:18,Toronto,Chrome/Windows,success
+customer_charlie,172.16.3.88,2024-01-15 14:45:22,Montreal,Firefox/macOS,success
+vendor_acme,10.0.5.55,2024-01-15 12:20:45,Toronto,Chrome/Windows,success
+scraper_bot,203.0.113.199,2024-01-15 03:30:15,Unknown,Python/Scraper,failed
+scraper_bot,203.0.113.199,2024-01-15 03:30:20,Unknown,Python/Scraper,failed
+customer_diana,198.51.100.234,2024-01-15 16:15:30,Calgary,Chrome/Android,success
+payment_sys,192.168.5.77,2024-01-15 00:00:15,Toronto,System/Automated,success
+customer_alice,203.0.113.45,2024-01-15 20:30:45,Toronto,Chrome/Windows,success
+inventory_mgr,10.0.5.33,2024-01-15 13:45:18,Toronto,Chrome/Windows,success
+api_service,192.168.5.99,2024-01-15 07:15:22,Toronto,API/Automated,success
+customer_eve,172.16.3.123,2024-01-15 18:20:30,Ottawa,Safari/iPad,success
+shipping_partner,198.51.100.88,2024-01-15 15:30:45,Montreal,System/Integration,success
+security_scan,203.0.113.77,2024-01-15 04:45:15,Unknown,Security/Scanner,failed
