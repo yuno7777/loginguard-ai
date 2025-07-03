@@ -1,38 +1,237 @@
-.App {
-    text-align: center;
+/* Custom styles for LogSentinel Lite */
+
+/* Global animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+@keyframes slideIn {
+  from { transform: translateX(-10px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
+/* Main container animations */
+.min-h-screen {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Header styles */
+header {
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+/* Card hover effects */
+.bg-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+/* Button hover effects */
+button:hover {
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* File upload area */
+.border-dashed:hover {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.02);
+  transition: all 0.3s ease;
+}
+
+/* Risk level color animations */
+.bg-red-100 {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  animation: slideIn 0.4s ease-out;
+}
+
+.bg-yellow-100 {
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  animation: slideIn 0.4s ease-out;
+}
+
+.bg-green-100 {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Overall risk card gradients */
+.bg-red-50 {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fecaca 100%);
+  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+}
+
+.bg-yellow-50 {
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 50%, #fde68a 100%);
+  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.1);
+}
+
+.bg-green-50 {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
+}
+
+/* Log card animations */
+.border.rounded-lg {
+  animation: slideIn 0.3s ease-out;
+  transition: all 0.3s ease;
+}
+
+.border.rounded-lg:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Tab animations */
+.bg-white.shadow-sm {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Loading spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Textarea focus effect */
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  transition: all 0.2s ease;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .flex.gap-4 {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+    gap: 1rem;
+  }
 }
 
-.App-link {
-    color: #61dafb;
+/* Icon animations */
+.text-6xl {
+  animation: pulse 2s infinite;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Error message styling */
+.bg-red-50 {
+  animation: slideIn 0.3s ease-out;
 }
+
+/* Success message styling */
+.bg-green-50 {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Statistics cards */
+.text-2xl.font-bold {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Custom focus styles */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Gradient backgrounds for hero section */
+.text-center h2 {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced card shadows */
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Recommendation list styling */
+.bg-blue-50 ul li {
+  animation: slideIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.bg-blue-50 ul li:nth-child(1) { animation-delay: 0.1s; }
+.bg-blue-50 ul li:nth-child(2) { animation-delay: 0.2s; }
+.bg-blue-50 ul li:nth-child(3) { animation-delay: 0.3s; }
+.bg-blue-50 ul li:nth-child(4) { animation-delay: 0.4s; }
+.bg-blue-50 ul li:nth-child(5) { animation-delay: 0.5s; }
+
+/* Enhanced button styles */
+.bg-blue-600 {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+}
+
+.bg-gray-600 {
+  background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+  box-shadow: 0 4px 14px 0 rgba(75, 85, 99, 0.39);
+}
+
+/* Risk badge styling */
+.px-2.py-1.rounded {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Detail expansion animation */
+.mt-3.pt-3 {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Grid layout improvements */
+.grid.gap-4 > div {
+  animation: slideIn 0.3s ease-out;
+}
+
+.grid.gap-4 > div:nth-child(1) { animation-delay: 0.1s; }
+.grid.gap-4 > div:nth-child(2) { animation-delay: 0.2s; }
+.grid.gap-4 > div:nth-child(3) { animation-delay: 0.3s; }
