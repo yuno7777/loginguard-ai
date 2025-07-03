@@ -1,13 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('upload');
+  const [activeView, setActiveView] = useState('main'); // 'main' or 'health'
   const [uploadedFile, setUploadedFile] = useState(null);
   const [rawLogs, setRawLogs] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [healthData, setHealthData] = useState(null);
+  const [sampleFiles, setSampleFiles] = useState([]);
+  const [exporting, setExporting] = useState({ csv: false, pdf: false });
   const fileInputRef = useRef(null);
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
