@@ -486,6 +486,20 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
           <div className="header-subtitle">
             AI-Powered Login Security Analysis
           </div>
+          <div className="header-nav">
+            <button
+              onClick={() => setActiveView('main')}
+              className={`nav-btn ${activeView === 'main' ? 'active' : ''}`}
+            >
+              Analysis
+            </button>
+            <button
+              onClick={() => setActiveView('health')}
+              className={`nav-btn ${activeView === 'health' ? 'active' : ''}`}
+            >
+              Health Monitor
+            </button>
+          </div>
         </div>
       </header>
 
