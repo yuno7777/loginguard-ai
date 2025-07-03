@@ -243,6 +243,169 @@ test_user,192.168.1.100,2024-01-16 08:30:15,New York,Chrome/Windows,failed`;
     }
   };
 
+  const HealthDashboard = () => {
+    if (!healthData) {
+      return (
+        <div className="health-dashboard">
+          <div className="health-loading">
+            <div className="spinner"></div>
+            <span>Loading health data...</span>
+          </div>
+        </div>
+      );
+    }
+
+    const getStatusColor = (status) => {
+      if (status === 'healthy' || status === 'Connected') return 'status-healthy';
+      if (status.includes('Error')) return 'status-error';
+      return 'status-warning';
+    };
+
+    const getAlertColor = (type) => {
+      switch (type) {
+        case 'critical': return 'alert-critical';
+        case 'warning': return 'alert-warning';
+        default: return 'alert-info';
+      }
+    };
+
+    return (
+      <div className="health-dashboard">
+        <div className="health-header">
+          <h2 className="health-title">System Health Dashboard</h2>
+          <div className={`overall-status ${getStatusColor(healthData.overall_status)}`}>
+            {healthData.overall_status.toUpperCase()}
+          </div>
+        </div>
+
+        {/* Alerts */}
+        {healthData.alerts && healthData.alerts.length > 0 && (
+          <div className="alerts-section">
+            <h3>Active Alerts</h3>
+            <div className="alerts-list">
+              {healthData.alerts.map((alert, index) => (
+                <div key={index} className={`alert ${getAlertColor(alert.type)}`}>
+                  <span className="alert-type">{alert.type.toUpperCase()}</span>
+                  <span className="alert-message">{alert.message}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* System Metrics */}
+        <div className="metrics-section">
+          <h3>System Metrics</h3>
+          <div className="metrics-grid">
+            <div className="metric-card">
+              <div className="metric-header">
+                <span className="metric-name">CPU Usage</span>
+                <span className="metric-value">{healthData.system_metrics.cpu_usage_percent}%</span>
+              </div>
+              <div className="metric-bar">
+                <div 
+                  className="metric-fill cpu" 
+                  style={{ width: `${healthData.system_metrics.cpu_usage_percent}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-header">
+                <span className="metric-name">Memory Usage</span>
+                <span className="metric-value">{healthData.system_metrics.memory_usage_percent}%</span>
+              </div>
+              <div className="metric-bar">
+                <div 
+                  className="metric-fill memory" 
+                  style={{ width: `${healthData.system_metrics.memory_usage_percent}%` }}
+                ></div>
+              </div>
+              <div className="metric-details">
+                {healthData.system_metrics.memory_used_gb}GB / {healthData.system_metrics.memory_total_gb}GB
+              </div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-header">
+                <span className="metric-name">Disk Usage</span>
+                <span className="metric-value">{healthData.system_metrics.disk_usage_percent}%</span>
+              </div>
+              <div className="metric-bar">
+                <div 
+                  className="metric-fill disk" 
+                  style={{ width: `${healthData.system_metrics.disk_usage_percent}%` }}
+                ></div>
+              </div>
+              <div className="metric-details">
+                {healthData.system_metrics.disk_used_gb}GB / {healthData.system_metrics.disk_total_gb}GB
+              </div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-header">
+                <span className="metric-name">System Uptime</span>
+                <span className="metric-value">{healthData.system_metrics.uptime_hours}h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Services Status */}
+        <div className="services-section">
+          <h3>Services Status</h3>
+          <div className="services-grid">
+            <div className="service-card">
+              <div className="service-header">
+                <span className="service-name">Database</span>
+                <span className={`service-status ${getStatusColor(healthData.services.database.status)}`}>
+                  {healthData.services.database.healthy ? 'ONLINE' : 'OFFLINE'}
+                </span>
+              </div>
+              <div className="service-details">
+                {healthData.services.database.status}
+              </div>
+            </div>
+
+            <div className="service-card">
+              <div className="service-header">
+                <span className="service-name">Gemini AI</span>
+                <span className={`service-status ${getStatusColor(healthData.services.gemini_ai.status)}`}>
+                  {healthData.services.gemini_ai.healthy ? 'ONLINE' : 'OFFLINE'}
+                </span>
+              </div>
+              <div className="service-details">
+                {healthData.services.gemini_ai.status}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Analytics */}
+        <div className="analytics-section">
+          <h3>Analytics</h3>
+          <div className="analytics-grid">
+            <div className="analytics-card">
+              <div className="analytics-number">{healthData.analytics.analyses_today}</div>
+              <div className="analytics-label">Analyses Today</div>
+            </div>
+            <div className="analytics-card">
+              <div className="analytics-number">{healthData.analytics.total_analyses}</div>
+              <div className="analytics-label">Total Analyses</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="health-footer">
+          <span>Last updated: {new Date(healthData.timestamp).toLocaleString()}</span>
+          <button onClick={fetchHealthData} className="refresh-btn">
+            Refresh
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   const LogCard = ({ log, index }) => {
     const [expanded, setExpanded] = useState(false);
     
