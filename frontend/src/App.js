@@ -16,6 +16,91 @@ const App = () => {
 
   const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
+  // Fetch health data
+  const fetchHealthData = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/health-dashboard`);
+      if (response.ok) {
+        const data = await response.json();
+        setHealthData(data);
+      }
+    } catch (err) {
+      console.error('Error fetching health data:', err);
+    }
+  };
+
+  // Fetch sample files
+  const fetchSampleFiles = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/sample-files`);
+      if (response.ok) {
+        const data = await response.json();
+        setSampleFiles(data.sample_files);
+      }
+    } catch (err) {
+      console.error('Error fetching sample files:', err);
+    }
+  };
+
+  // Load health data and sample files on component mount
+  useEffect(() => {
+    fetchHealthData();
+    fetchSampleFiles();
+    
+    // Refresh health data every 30 seconds
+    const interval = setInterval(fetchHealthData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const exportAnalysis = async (format) => {
+    if (!analysisResult?.analysis_id) return;
+
+    setExporting(prev => ({ ...prev, [format]: true }));
+
+    try {
+      const response = await fetch(`${backendUrl}/api/export-${format}/${analysisResult.analysis_id}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Create download link
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `loginguard_analysis_${analysisResult.analysis_id.slice(0, 8)}.${format}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+    } catch (err) {
+      setError(`Error exporting ${format.toUpperCase()}: ${err.message}`);
+    } finally {
+      setExporting(prev => ({ ...prev, [format]: false }));
+    }
+  };
+
+  const loadSampleFile = async (filename) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/sample-file/${filename}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const csvContent = await response.text();
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const file = new File([blob], filename, { type: 'text/csv' });
+      setUploadedFile(file);
+      setError(null);
+    } catch (err) {
+      setError(`Error loading sample file: ${err.message}`);
+    }
+  };
+
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
