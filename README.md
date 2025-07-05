@@ -634,5 +634,3 @@ sudo apt install rsyslog
 ```
 
 ---
-
-*Last updated: 2024*
